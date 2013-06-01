@@ -58,8 +58,6 @@ yourls_add_action( 'admin_init', 'authmgr_intercept_admin' );
  * to add a unique hook for each action, but unfortunately we need to
  * hook the admin page load itself, and try to figure out what action
  * is intended.
- * 
- * TODO: Maybe YOURLS could be improved with more detailed action hooks.
  */
 function authmgr_intercept_admin() {
 	authmgr_require_capability( AuthmgrCapability::ShowAdmin );
@@ -126,8 +124,6 @@ function authmgr_html_append_roles( $original ) {
  */
 function authmgr_require_capability( $capability ) {
 	if ( !authmgr_have_capability( $capability ) ) {
-		// TODO: display a much nicer error page
-		//die('Sorry, you are not authorized for the action: '.$capability);
                 yourls_redirect( yourls_admin_url( '?access=denied' ), 302 );
 		die();
 	}
@@ -150,7 +146,6 @@ function authmgr_enumerate_current_capabilities() {
 }
 
 function authmgr_enumerate_all_capabilities() {
-	// TODO: generalize this, instead of just repeating the total declaration
 	return array(
 		AuthmgrCapability::ShowAdmin,
 		AuthmgrCapability::AddURL,
@@ -169,10 +164,6 @@ function authmgr_enumerate_all_capabilities() {
  * is permitted in the current context. Any function in the filter
  * chain can change the response, but well-behaved functions will
  * only change 'false' to 'true', never the other way around.
- * 
- * TODO: how to convey context when we later implement "ownership" on
- *       URL rows? maybe send an array that includes capabilitity
- *       and other context variables.
  */
 function authmgr_have_capability( $capability ) {
         return yourls_apply_filter( AUTHMGR_ALLOW, false, $capability);
@@ -201,10 +192,6 @@ function authmgr_check_anon_capability( $original, $capability ) {
 
 /*
  * What capabilities are available through role assignments to the active user?
- * 
- * TODO: maybe pre-calculate an access token for the current user with all
- *       of the permitted capabilities. Then this function would simply
- *       check the contents of the access token.
  */
 yourls_add_filter( AUTHMGR_ALLOW, 'authmgr_check_user_capability', 10 );
 function authmgr_check_user_capability( $original, $capability ) {
@@ -270,8 +257,6 @@ function authmgr_check_apiuser_capability( $original, $capability ) {
 	// In API mode and not using user/path authn? Let it go.
 	if ( yourls_is_API() && !isset($_REQUEST['username']) )
 		return true;
-	// TODO: add controls for actions, like
-	// shorturl, stats, db-stats, url-stats, expand
 
 	return $original;
 }
@@ -279,13 +264,7 @@ function authmgr_check_apiuser_capability( $original, $capability ) {
 /******************** ROLE TEST AND ENUMERATION ***********************/
 
 /*
- * TODO: consider moving roles into a database table, and manipulate with web GUI
- * TODO: consider allowing other plugins to contribute capabilities with a filter chain
- */
-
-/*
  * Determine whether a specific user has a role.
- * TODO: don't use filter chains for role enumeration. that's silly.
  */
 function authmgr_user_has_role( $username, $rolename ) {
 	return yourls_apply_filter( AUTHMGR_HASROLE, false, $username, $rolename );
@@ -331,7 +310,7 @@ function authmgr_environment_check() {
 	if ( !isset( $authmgr_anon_capabilities) ) {
 		$authmgr_anon_capabilities = array(
 			AuthmgrCapability::API,
-			AuthmgrCapability::ShowAdmin,//TODO: hack! how to allow logon page?
+			AuthmgrCapability::ShowAdmin,
 		);
 	}
 
@@ -373,7 +352,6 @@ function authmgr_environment_check() {
 
 	// convert role assignment table to lower case if it hasn't been done already
 	// this makes searches much easier!
-	// TODO: avoid doing this every time we validate
 	$authmgr_role_assignment_lower = array();
 	foreach ( $authmgr_role_assignment as $key => $value ) {
 		$t_key = strtolower( $key );
