@@ -18,7 +18,6 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
  * should be allowed to proceed. The filter names are defined here.
  */
 define( 'AUTHMGR_ALLOW',   'filter_authmgr_allow'   );
-define( 'AUTHMGR_HASROLE', 'filter_authmgr_hasrole' );
 
 // Define constants used for naming roles (but they don't work in config.php)
 class AuthmgrRoles {
@@ -279,20 +278,9 @@ function authmgr_check_apiuser_capability( $original, $capability ) {
 
 /*
  * Determine whether a specific user has a role.
+ * Currently based on role definitions in user/config.php
  */
 function authmgr_user_has_role( $username, $rolename ) {
-	return yourls_apply_filter( AUTHMGR_HASROLE, false, $username, $rolename );
-}
-
-// ******************* FILTERS THAT GRANT ROLE MEMBERSHIP *********************
-// By filtering AUTHMGR_HASROLE, you can connect internal roles to something else.
-// Any filter handlers should execute as quickly as possible.
-
-/*
- * What role memberships are defined for the user in user/config.php?
- */
-yourls_add_filter( AUTHMGR_HASROLE, 'authmgr_user_has_role_in_config');
-function authmgr_user_has_role_in_config( $original, $username, $rolename ) {
 	global $authmgr_role_assignment;
 
 	// if no role assignments are created, grant everything
