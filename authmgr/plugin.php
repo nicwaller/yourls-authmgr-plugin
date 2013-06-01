@@ -317,9 +317,7 @@ function authmgr_environment_check() {
 	global $authmgr_role_assignment;
 
 	if ( !isset( $authmgr_anon_capabilities) ) {
-		$authmgr_anon_capabilities = array(
-			AuthmgrCapability::API,
-		);
+		$authmgr_anon_capabilities = array();
 	}
 
 	if ( !isset( $authmgr_role_capabilities) ) {
