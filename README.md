@@ -16,9 +16,11 @@ Default Roles
 -------------
 The default roles are set up as follows:
 
-* Administrator : No limits
-* Editor : Cannot manage plugins
-* Contributor : Cannot manage plugins, edit URLS, or delete URLs
+Role          | Capabilities
+--------------|-------------------------------------------------
+Administrator | No Limits
+Editor        | Cannot manage plugins
+Contributor   | Cannot manage plugins, edit URLs, or delete URLs
 
 Configuration
 -------------
