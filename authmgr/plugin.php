@@ -124,6 +124,17 @@ function authmgr_html_append_roles( $original ) {
 	}
 }
 
+/************** PLUGIN ADMIN PAGE *************************/
+
+yourls_add_action( 'plugins_loaded', 'authmgr_add_page' );
+function authmgr_add_page() {
+	yourls_register_plugin_page( 'authmgr', 'Authorization Manager', 'authmgr_display_page' );
+}
+
+function authmgr_display_page() {
+	echo "Get option content and render page here!";
+}
+
 /**************** CAPABILITY TEST/ENUMERATION ****************/
 
 /*
