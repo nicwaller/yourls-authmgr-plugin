@@ -1,12 +1,12 @@
 <?php
-/**
- * Plugin Name: Authorization Manager
- * Plugin URI:  https://github.com/nicwaller/yourls-authmgr-plugin
- * Description: Restrict classes of users to specific functions
- * Version:     0.9.2
- * Author:      nicwaller
- * Author URI:  https://github.com/nicwaller
- */
+/*
+Plugin Name: Authorization Manager
+Plugin URI:  https://github.com/nicwaller/yourls-authmgr-plugin
+Description: Restrict classes of users to specific functions
+Version:     0.9.2
+Author:      nicwaller
+Author URI:  https://github.com/nicwaller
+*/
 
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
