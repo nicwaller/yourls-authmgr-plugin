@@ -1,50 +1,66 @@
 <?php
-/*
-Plugin Name: Authorization Manager
-Plugin URI: https://github.com/nicwaller/yourls-authmgr-plugin
-Description: Restrict classes of users to specific functions
-Version: 1.0
-Author: nicwaller
-Author URI: https://github.com/nicwaller
-*/
+/**
+ * Plugin Name: Authorization Manager
+ * Plugin URI:  https://github.com/nicwaller/yourls-authmgr-plugin
+ * Description: Restrict classes of users to specific functions
+ * Version:     0.9.2
+ * Author:      nicwaller
+ * Author URI:  https://github.com/nicwaller
+ */
 
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
 /****************** SET UP CONSTANTS ******************/
 
-// Define constants for critical filters
-define( 'AUTHMGR_ALLOW', 'filter_authmgr_allow' );
+/**
+ * This plugin uses filter chains to evaluate whether specific actions
+ * should be allowed to proceed. The filter names are defined here.
+ */
+define( 'AUTHMGR_ALLOW',   'filter_authmgr_allow'   );
 define( 'AUTHMGR_HASROLE', 'filter_authmgr_hasrole' );
 
 // Define constants used for naming roles (but they don't work in config.php)
 class AuthmgrRoles {
 	const Administrator = 'Administrator';
-	const Editor = 'Editor';
-	const Contributor = 'Contributor';
+	const Editor        = 'Editor';
+	const Contributor   = 'Contributor';
 }
 
 // Define constants used for naming capabilities
 class AuthmgrCapability {
-	const ShowAdmin = 'ShowAdmin'; // only display admin panel
-	const AddURL = 'AddURL';
-	const DeleteURL = 'DeleteURL';
-	const EditURL = 'EditURL';
+	const ShowAdmin     = 'ShowAdmin'; // only display admin panel
+	const AddURL        = 'AddURL';
+	const DeleteURL     = 'DeleteURL';
+	const EditURL       = 'EditURL';
 	const ManagePlugins = 'ManagePlugins';
-	const API = 'API';
-	const ViewStats = 'ViewStats';
+	const API           = 'API';
+	const ViewStats     = 'ViewStats';
 }	
 
 
 /********** Add hooks to intercept functionality in CORE ********/
 
 yourls_add_action( 'load_template_infos', 'authmgr_intercept_stats' );
-function authmgr_intercept_stats() { authmgr_require_capability( AuthmgrCapability::ViewStats ); }
+function authmgr_intercept_stats() {
+	authmgr_require_capability( AuthmgrCapability::ViewStats );
+}
 
 yourls_add_action( 'api', 'authmgr_intercept_api' );
-function authmgr_intercept_api() { authmgr_require_capability( AuthmgrCapability::API ); }
+function authmgr_intercept_api() {
+	authmgr_require_capability( AuthmgrCapability::API );
+}
+
 
 yourls_add_action( 'admin_init', 'authmgr_intercept_admin' );
+/**
+ * YOURLS processes most actions in the admin page. It would be ideal
+ * to add a unique hook for each action, but unfortunately we need to
+ * hook the admin page load itself, and try to figure out what action
+ * is intended.
+ * 
+ * TODO: Maybe YOURLS could be improved with more detailed action hooks.
+ */
 function authmgr_intercept_admin() {
 	authmgr_require_capability( AuthmgrCapability::ShowAdmin );
 
@@ -71,7 +87,7 @@ function authmgr_intercept_admin() {
                 }
 	}
 
-	// also intercept AJAX requests
+	// Key actions like Add/Edit/Delete are AJAX requests
 	if ( yourls_is_Ajax() ) {
 		$action_keyword = $_REQUEST['action'];
 		$cap_needed = $action_capability_map[$action_keyword];
@@ -88,6 +104,10 @@ function authmgr_intercept_admin() {
 }
 
 yourls_add_filter( 'logout_link', 'authmgr_html_append_roles' );
+/**
+ * This is a cosmetic filter that makes it possible to see which roles are
+ * currently available, just by mousing over the username in the logout link.
+ */
 function authmgr_html_append_roles( $original ) {
         $authenticated = yourls_is_valid_user();
         if ( $authenticated === true ) {
@@ -143,14 +163,23 @@ function authmgr_enumerate_all_capabilities() {
 }
 
 /*
- * Is the requested capability permitted in this context?
+ * This is where everything comes together.
+ * 
+ * Use the "allow" filter chain to see if the requested capability
+ * is permitted in the current context. Any function in the filter
+ * chain can change the response, but well-behaved functions will
+ * only change 'false' to 'true', never the other way around.
+ * 
+ * TODO: how to convey context when we later implement "ownership" on
+ *       URL rows? maybe send an array that includes capabilitity
+ *       and other context variables.
  */
 function authmgr_have_capability( $capability ) {
         return yourls_apply_filter( AUTHMGR_ALLOW, false, $capability);
 }
 
 /******************* FILTERS THAT GRANT CAPABILITIES *****************************/
-/*  By filtering AUTHMGR_ALLOW, you can grant capabilities without using roles.  */
+/* Whether an action is permitted is decided by running a filter chain. */
 /*********************************************************************************/
 
 /*
@@ -172,6 +201,10 @@ function authmgr_check_anon_capability( $original, $capability ) {
 
 /*
  * What capabilities are available through role assignments to the active user?
+ * 
+ * TODO: maybe pre-calculate an access token for the current user with all
+ *       of the permitted capabilities. Then this function would simply
+ *       check the contents of the access token.
  */
 yourls_add_filter( AUTHMGR_ALLOW, 'authmgr_check_user_capability', 10 );
 function authmgr_check_user_capability( $original, $capability ) {
@@ -246,7 +279,13 @@ function authmgr_check_apiuser_capability( $original, $capability ) {
 /******************** ROLE TEST AND ENUMERATION ***********************/
 
 /*
+ * TODO: consider moving roles into a database table, and manipulate with web GUI
+ * TODO: consider allowing other plugins to contribute capabilities with a filter chain
+ */
+
+/*
  * Determine whether a specific user has a role.
+ * TODO: don't use filter chains for role enumeration. that's silly.
  */
 function authmgr_user_has_role( $username, $rolename ) {
 	return yourls_apply_filter( AUTHMGR_HASROLE, false, $username, $rolename );
