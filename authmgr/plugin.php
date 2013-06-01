@@ -17,7 +17,7 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
  * This plugin uses filter chains to evaluate whether specific actions
  * should be allowed to proceed. The filter names are defined here.
  */
-define( 'AUTHMGR_ALLOW',   'filter_authmgr_allow'   );
+define( 'AUTHMGR_ALLOW', 'filter_authmgr_allow' );
 
 // Define constants used for naming roles (but they don't work in config.php)
 class AuthmgrRoles {
@@ -178,8 +178,8 @@ function authmgr_enumerate_all_capabilities() {
  * chain can change the response, but well-behaved functions will
  * only change 'false' to 'true', never the other way around.
  */
-function authmgr_have_capability( $capability ) {
-        return yourls_apply_filter( AUTHMGR_ALLOW, false, $capability);
+function authmgr_have_capability( $capability, $object=null ) {
+        return yourls_apply_filter( AUTHMGR_ALLOW, false, $capability, $object);
 }
 
 /******************* FILTERS THAT GRANT CAPABILITIES *****************************/
@@ -190,7 +190,7 @@ function authmgr_have_capability( $capability ) {
  * What capabilities are always available, including anonymous users?
  */
 yourls_add_filter( AUTHMGR_ALLOW, 'authmgr_check_anon_capability', 5 );
-function authmgr_check_anon_capability( $original, $capability ) {
+function authmgr_check_anon_capability( $original, $capability, $object ) {
 	global $authmgr_anon_capabilities;
 
 	// Shortcut - trust approval given by earlier filters
@@ -207,7 +207,7 @@ function authmgr_check_anon_capability( $original, $capability ) {
  * What capabilities are available through role assignments to the active user?
  */
 yourls_add_filter( AUTHMGR_ALLOW, 'authmgr_check_user_capability', 10 );
-function authmgr_check_user_capability( $original, $capability ) {
+function authmgr_check_user_capability( $original, $capability, $object ) {
 	global $authmgr_role_capabilities;
 
 	// Shortcut - trust approval given by earlier filters
@@ -242,7 +242,7 @@ function authmgr_check_user_capability( $original, $capability ) {
  * By default, only 127.0.0.0/8 (localhost) is an admin range.
  */
 yourls_add_filter( AUTHMGR_ALLOW, 'authmgr_check_admin_ipranges', 15 );
-function authmgr_check_admin_ipranges( $original, $capability ) {
+function authmgr_check_admin_ipranges( $original, $capability, $object ) {
 	global $authmgr_admin_ipranges;
 
         // Shortcut - trust approval given by earlier filters
@@ -263,7 +263,7 @@ function authmgr_check_admin_ipranges( $original, $capability ) {
  * What capabilities are available when making API requests without a username?
  */
 yourls_add_filter( AUTHMGR_ALLOW, 'authmgr_check_apiuser_capability', 15 );
-function authmgr_check_apiuser_capability( $original, $capability ) {
+function authmgr_check_apiuser_capability( $original, $capability, $object ) {
 	// Shortcut - trust approval given by earlier filters
 	if ( $original === true ) return true;
 
