@@ -27,15 +27,21 @@ class AuthmgrRoles {
 	const Contributor   = 'Contributor';
 }
 
-// Define constants used for naming capabilities
+// Declare capability names for YOURLS built-in functionality
 class AuthmgrCapability {
-	const ShowAdmin     = 'ShowAdmin'; // only display admin panel
+	const ShowAdmin     = 'ShowAdmin';
 	const AddURL        = 'AddURL';
 	const DeleteURL     = 'DeleteURL';
 	const EditURL       = 'EditURL';
 	const ManagePlugins = 'ManagePlugins';
 	const API           = 'API';
 	const ViewStats     = 'ViewStats';
+
+	public function all()
+	{
+		$reflect = new ReflectionClass(get_class($this));
+		return $reflect->getConstants();
+	}
 }	
 
 
@@ -154,16 +160,15 @@ function authmgr_enumerate_current_capabilities() {
 	return $current_capabilities;
 }
 
+/**
+ * Returns a list of all capabilities that authmgr is aware of.
+ * This list will be used to build the authmgr GUI.
+ * Other plugins can take advantage of authmgr by hooking this filter.
+ */
 function authmgr_enumerate_all_capabilities() {
-	return array(
-		AuthmgrCapability::ShowAdmin,
-		AuthmgrCapability::AddURL,
-		AuthmgrCapability::DeleteURL,
-		AuthmgrCapability::EditURL,
-		AuthmgrCapability::ManagePlugins,
-		AuthmgrCapability::API,
-		AuthmgrCapability::ViewStats,
-	);
+	$default_caps = AuthmgrCapability::all();
+	$all_caps = yourls_apply_filter( 'authmgr_capabilities', $default_caps);
+	return $all_caps;
 }
 
 /*
