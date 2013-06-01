@@ -52,12 +52,15 @@ function authmgr_intercept_api() {
 }
 
 
-yourls_add_action( 'admin_init', 'authmgr_intercept_admin' );
+yourls_add_action( 'auth_successful', 'authmgr_intercept_admin' );
 /**
  * YOURLS processes most actions in the admin page. It would be ideal
  * to add a unique hook for each action, but unfortunately we need to
  * hook the admin page load itself, and try to figure out what action
  * is intended.
+ *
+ * At this point, reasonably assume that the current request is for
+ * a rendering of the admin page.
  */
 function authmgr_intercept_admin() {
 	authmgr_require_capability( AuthmgrCapability::ShowAdmin );
@@ -124,6 +127,12 @@ function authmgr_html_append_roles( $original ) {
  */
 function authmgr_require_capability( $capability ) {
 	if ( !authmgr_have_capability( $capability ) ) {
+		// If the user can't view admin interface, return a plain error.
+		if ( !authmgr_have_capability( AuthmgrCapability::ShowAdmin ) ) {
+			header("HTTP/1.0 403 Forbidden");
+			die('Require permissions to show admin interface.');
+		}
+		// Otherwise, render errors in admin interface
                 yourls_redirect( yourls_admin_url( '?access=denied' ), 302 );
 		die();
 	}
@@ -310,7 +319,6 @@ function authmgr_environment_check() {
 	if ( !isset( $authmgr_anon_capabilities) ) {
 		$authmgr_anon_capabilities = array(
 			AuthmgrCapability::API,
-			AuthmgrCapability::ShowAdmin,
 		);
 	}
 
