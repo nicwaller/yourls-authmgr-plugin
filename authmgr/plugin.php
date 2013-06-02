@@ -132,7 +132,42 @@ function authmgr_add_page() {
 }
 
 function authmgr_display_page() {
-	echo "Get option content and render page here!";
+	if ( count( $_POST ) > 0 ) {
+		$rolenames = $_POST['rolenames'];
+		$roledefs = array();
+		foreach ($rolenames as $role) {
+			$roledefs[$role] = $_POST['role-'.$role];
+		}
+		yourls_update_option( 'authmgr_roles', json_encode( $roledefs ) );
+		echo '<b>Updated authmgr roles</b>';
+	}
+	
+	$roles = json_decode( yourls_get_option( 'authmgr_roles' ), true );
+
+	echo '<form name="roles" method="POST" action="plugins.php?page=authmgr">';
+	echo '<table border="1">';
+	$allcaps = AuthmgrCapability::all();
+	echo '<tr> <th></th>';
+	foreach ($allcaps as $cap) {
+		echo "<th>$cap</th>";
+	}
+	echo '</tr>';
+	foreach ($roles as $role => $selcaps) {
+		echo '<input type="hidden" name="rolenames[]" value="'.$role.'">';
+		echo '<tr>';
+		echo "<th>$role</th>";
+		foreach ($allcaps as $cap) {
+			echo '<td>';
+			$active = in_array( $cap, $selcaps );
+			$selstr = ( $active ? 'checked' : '' );
+			echo '<input type="checkbox" name="role-'.$role.'[]" value="'.$cap.'" '.$selstr.'>';
+			echo '</td>';
+		}
+		echo '</tr>';
+	}
+	echo '</table>';
+	echo '<input type="submit" value="Update Roles">';
+	echo '</form>';
 }
 
 /**************** CAPABILITY TEST/ENUMERATION ****************/
