@@ -75,6 +75,7 @@ function authmgr_intercept_admin() {
         	'delete' => AuthmgrCapability::DeleteURL,
         	'edit_display' => AuthmgrCapability::EditURL,
         	'edit_save' => AuthmgrCapability::EditURL,
+        	'edit_save_custom' => AuthmgrCapability::EditURL, //To enable compatibility with Track-Custom-Keywords
         	'activate' => AuthmgrCapability::ManagePlugins,
         	'deactivate' => AuthmgrCapability::ManagePlugins,
 	);
