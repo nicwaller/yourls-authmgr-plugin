@@ -83,6 +83,27 @@ function authmgr_intercept_admin() {
         	'activate' => AuthmgrCapability::ManagePlugins,
         	'deactivate' => AuthmgrCapability::ManagePlugins,
 	);
+	
+	// Restrict access to some plugins pages. Page name -> capability
+	$page_capability_map = array(
+		'apelly_blacklist_domain' => AuthmgrCapability::ManagePlugins,
+		'anonymizer' => AuthmgrCapability::ManagePlugins,
+		'popularclicksextended' => AuthmgrCapability::ManagePlugins,
+		'rscrub' => AuthmgrCapability::ManagePlugins,
+		'popular_links' => AuthmgrCapability::ManagePlugins,
+		'key_char_len' => AuthmgrCapability::ManagePlugins,
+		'fallback_url_config' => AuthmgrCapability::ManagePlugins,
+		'ozh_lmr' => AuthmgrCapability::ManagePlugins,
+	);	
+	
+	// Restrict access to some plugins pages
+	if ( isset( $_REQUEST['page'] ) ) {
+		$action_keyword = $_REQUEST['page'];
+		$cap_needed = $page_capability_map[$action_keyword];
+		if ( $cap_needed !== NULL && authmgr_have_capability( $cap_needed ) !== true) {
+			yourls_redirect( yourls_admin_url( '?access=denied' ), 302 );
+		}
+	}	
 
 	// intercept requests for plugin management
 	if ( isset( $_REQUEST['plugin'] ) ) {
