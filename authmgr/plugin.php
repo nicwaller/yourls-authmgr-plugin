@@ -43,12 +43,16 @@ class AuthmgrCapability {
 
 yourls_add_action( 'load_template_infos', 'authmgr_intercept_stats' );
 function authmgr_intercept_stats() {
-	authmgr_require_capability( AuthmgrCapability::ViewStats );
+	if ( YOURLS_PRIVATE_INFOS === true ) {
+		authmgr_require_capability( AuthmgrCapability::ViewStats );
+	}
 }
 
 yourls_add_action( 'api', 'authmgr_intercept_api' );
 function authmgr_intercept_api() {
-	authmgr_require_capability( AuthmgrCapability::API );
+	if ( YOURLS_PRIVATE_API === true ) {
+		authmgr_require_capability( AuthmgrCapability::API );
+	}
 }
 
 
