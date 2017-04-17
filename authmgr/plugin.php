@@ -3,7 +3,7 @@
 Plugin Name: Authorization Manager
 Plugin URI:  https://github.com/nicwaller/yourls-authmgr-plugin
 Description: Restrict classes of users to specific functions
-Version:     0.9.2
+Version:     0.9.3
 Author:      nicwaller
 Author URI:  https://github.com/nicwaller
 */
