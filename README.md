@@ -1,5 +1,7 @@
 yourls-authmgr-plugin
 =====================
+Please see [AuthMGrPlus](https://github.com/joshp23/YOURLS-AuthMgrPlus) for active development. AuthMgrPlus is a substantial update and rewrite to this plugin which realizes _most-if-not-all_ requested/desired feature and clears all error-based issues.
+--------------------
 
 This plugin adds role-based access controls (RBAC) to YOURLS. By assigning users to roles like "Editor" and "Contributor" you can limit the changes they are permitted to make.
 
